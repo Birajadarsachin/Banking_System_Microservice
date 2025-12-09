@@ -34,11 +34,7 @@ The entire system is containerized using **Docker & Docker Compose**.
 
 ---
 
-# 🏛 Architecture Diagram  
-### Add your PNG diagram here:
-```
-architecture.png
-```
+
 
 ### PlantUML Source (for export):
 ```plantuml
