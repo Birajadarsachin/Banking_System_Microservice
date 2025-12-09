@@ -1,39 +1,46 @@
 # Banking System Simulator — Microservices Architecture  
-(Spring Boot + Spring Cloud + MongoDB + Docker)
-
-## 📌 Project Overview
-This project implements a **Banking System using Microservices**, following real-world distributed architecture principles. Each business domain is developed as an independent service with its own database, deployed and managed via Docker.
-
-### ✔ Microservices included:
-- **Eureka Server** (Service Discovery)
-- **API Gateway** (Routing & Entry Point)
-- **Account Service** (Account CRUD + balance updates)
-- **Transaction Service** (Deposit, Withdraw, Transfer)
-- **Notification Service** (Simulated email/log notifications)
-
-### ✔ Tech Stack
-- Java 17  
-- Spring Boot 3.x  
-- Spring Cloud (Eureka, Gateway, Config patterns)  
-- MongoDB  
-- RestTemplate (with LoadBalancer)  
-- Resilience4j (Circuit Breaker)  
-- SLF4J + MDC (Correlation ID Logging)  
-- Docker & Docker Compose  
-- JUnit5 + Mockito  
+**Spring Boot + Spring Cloud + MongoDB + Docker**
 
 ---
 
-## 🏛 Architecture Diagram  
-### High-Level Microservices Architecture  
-(Place your PNG diagram here after exporting from PlantUML)
+## 📌 Project Overview
+This project implements a **modular banking system** using a Microservices Architecture.  
+Each domain (Accounts, Transactions, Notifications) runs as an independent Spring Boot microservice with its own MongoDB database.
 
-/architecture.png
+All services communicate via **REST APIs**, register with **Eureka Server**, and route through **Spring Cloud Gateway**.  
+The entire system is containerized using **Docker & Docker Compose**.
 
-pgsql
-Copy code
+---
 
-### PlantUML Source (use for PNG export)
+## ✔ Microservices Included
+- **Eureka Server** – Service Discovery  
+- **API Gateway** – Entry point + routing  
+- **Account Service** – Account CRUD + balance updates  
+- **Transaction Service** – Deposit/Withdraw/Transfer + Circuit Breaker  
+- **Notification Service** – Simulated notification logs  
+
+---
+
+## ✔ Tech Stack
+- Java 17  
+- Spring Boot 3.x  
+- Spring Cloud (Eureka, Gateway, LoadBalancer)  
+- MongoDB  
+- RestTemplate + @LoadBalanced  
+- Resilience4j Circuit Breaker  
+- SLF4J + MDC Correlation ID logging  
+- Docker & Docker Compose  
+- JUnit 5 + Mockito  
+
+---
+
+# 🏛 Architecture Diagram  
+### Add your PNG diagram here:
+```
+architecture.png
+```
+
+### PlantUML Source (for export):
 ```plantuml
 @startuml
 skinparam componentStyle rectangle
@@ -52,19 +59,21 @@ cloud "banking-net (Docker)" {
 }
 
 Client --> gateway : /api/accounts/**\n/api/transactions/**
-gateway --> account : Route -> /api/accounts/**
-gateway --> transaction : Route -> /api/transactions/**
+gateway --> account : Route → /api/accounts/**
+gateway --> transaction : Route → /api/transactions/**
 transaction --> account : REST → Update Balance
 transaction --> notification : REST → Send Notification
 gateway --> eureka : Register
 account --> eureka : Register
 transaction --> eureka : Register
 notification --> eureka : Register
-
 @enduml
-📁 Folder Structure (Deliverables)
-pgsql
-Copy code
+```
+
+---
+
+# 📁 Folder Structure (Deliverables)
+```
 banking-system-microservice/
 │
 ├── eureka-server/
@@ -94,103 +103,123 @@ banking-system-microservice/
 │
 ├── docker-compose.yml
 └── README.md
-✔ Source code for each microservice
-✔ Dockerfile for each microservice
-✔ README with setup + architecture (this file)
+```
 
-⚙️ How to Run the Entire System (Docker Compose)
-1️⃣ Ensure Docker Desktop is running
-2️⃣ From the project root, run:
-bash
-Copy code
+---
+
+# ⚙️ How to Run the Entire System (Docker Compose)
+
+### 1️⃣ Ensure Docker Desktop is running  
+### 2️⃣ From project root:
+```bash
 docker-compose up -d
-3️⃣ Verify services
-Eureka Dashboard → http://localhost:8761
+```
 
-API Gateway → http://localhost:8085
+### 3️⃣ Verify services:
+- Eureka → http://localhost:8761  
+- API Gateway → http://localhost:8085  
 
-4️⃣ Stop all services:
-bash
-Copy code
+### 4️⃣ Stop everything:
+```bash
 docker-compose down
-🧪 API Endpoints
-Account Service
-Method	Endpoint	Description
-POST	/api/accounts	Create account
-GET	/api/accounts/{accNo}	Get account
-PUT	/api/accounts/{accNo}/balance	Update balance
-PUT	/api/accounts/{accNo}/status	Update status
+```
 
-Transaction Service
-Method	Endpoint	Description
-POST	/api/transactions/deposit	Deposit
-POST	/api/transactions/withdraw	Withdraw
-POST	/api/transactions/transfer	Transfer
-GET	/api/transactions/account/{accNo}	Transaction history
+---
 
-Notification Service
-Method	Endpoint
-POST	/api/notifications/send
+# 🧪 API Endpoints
 
-🔁 Example Test Flow (via Gateway)
-1️⃣ Create Account
-POST → http://localhost:8085/api/accounts
+## **Account Service**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/accounts` | Create account |
+| GET | `/api/accounts/{accNo}` | Fetch account |
+| PUT | `/api/accounts/{accNo}/balance` | Update balance |
+| PUT | `/api/accounts/{accNo}/status` | Update status |
+
+---
+
+## **Transaction Service**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/transactions/deposit` | Deposit amount |
+| POST | `/api/transactions/withdraw` | Withdraw amount |
+| POST | `/api/transactions/transfer` | Transfer amount |
+| GET | `/api/transactions/account/{accNo}` | Transaction history |
+
+---
+
+## **Notification Service**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/notifications/send` | Send notification |
+
+---
+
+# 🔁 Example Test Flow (via Gateway)
+
+### 1️⃣ Create Account
+```
+POST http://localhost:8085/api/accounts
+```
 Body:
-
-json
-Copy code
+```json
 {
   "accountNumber": "ACC1001",
   "holderName": "Sachin",
   "balance": 5000
 }
-2️⃣ Deposit
-POST →
+```
 
-bash
-Copy code
-http://localhost:8085/api/transactions/deposit?accountNumber=ACC1001&amount=500
-3️⃣ Withdraw
-POST →
+### 2️⃣ Deposit
+```
+POST http://localhost:8085/api/transactions/deposit?accountNumber=ACC1001&amount=500
+```
 
-bash
-Copy code
-http://localhost:8085/api/transactions/withdraw?accountNumber=ACC1001&amount=200
-4️⃣ Transfer
-POST →
+### 3️⃣ Withdraw
+```
+POST http://localhost:8085/api/transactions/withdraw?accountNumber=ACC1001&amount=200
+```
 
-bash
-Copy code
-http://localhost:8085/api/transactions/transfer?sourceAccount=ACC1001&destinationAccount=ACC2001&amount=300
-5️⃣ Check Transaction History
-GET →
+### 4️⃣ Transfer
+```
+POST http://localhost:8085/api/transactions/transfer?sourceAccount=ACC1001&destinationAccount=ACC2001&amount=300
+```
 
-bash
-Copy code
-http://localhost:8085/api/transactions/account/ACC1001
-🛡 Resilience & Logging
-Circuit breaker added for Account Service calls
+### 5️⃣ Transaction History
+```
+GET http://localhost:8085/api/transactions/account/ACC1001
+```
 
-Fallback methods added for failures
+---
 
-Distributed logs using SLF4J + Correlation ID (X-Correlation-Id)
+# 🛡 Resilience & Logging
+### ✔ Circuit Breaker  
+Resilience4j handles failures for Account Service calls.
 
-MDC used to trace requests across microservices
+### ✔ Logging  
+- SLF4J structured logs  
+- Correlation ID using MDC  
+- Distributed tracing across microservices  
 
-🧪 Unit Tests
-Run tests per service:
+---
 
-bash
-Copy code
+# 🧪 Unit Tests
+Run:
+```bash
 mvn test
-Includes:
+```
 
-Service layer tests
+Covers:
+- Service layer  
+- Mockito mocks  
+- Behavior validation  
 
-Mockito mocks
+---
 
-Dependency injection tests
+# 👨‍💻 Contributor
+**Sachin Birajdar** — Developer  
 
-👨‍💻 Contributors
-Sachin Birajdar — Developer
-Project built for academic + portfolio purposes.
+---
+
+# 📝 Notes  
+This system demonstrates a fully containerized microservices architecture with Spring Cloud, MongoDB, Docker, and distributed logging.
