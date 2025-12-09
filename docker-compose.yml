@@ -1,0 +1,57 @@
+version: "3.9"
+
+services:
+
+  eureka-server:
+    image: banking/eureka-server:0.1
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - banking-net
+
+  api-gateway:
+    image: banking/api-gateway:0.2
+    container_name: api-gateway
+    depends_on:
+      - eureka-server
+    ports:
+      - "8085:8080"
+    networks:
+      - banking-net
+
+  account-service:
+    image: banking/account-service:0.2
+    container_name: account-service
+    depends_on:
+      - eureka-server
+    ports:
+      - "8081:8081"
+    networks:
+      - banking-net
+
+  transaction-service:
+    image: banking/transaction-service:0.1
+    container_name: transaction-service
+    depends_on:
+      - account-service
+      - notification-service
+      - eureka-server
+    ports:
+      - "8082:8082"
+    networks:
+      - banking-net
+
+  notification-service:
+    image: banking/notification-service:0.1
+    container_name: notification-service
+    depends_on:
+      - eureka-server
+    ports:
+      - "8083:8083"
+    networks:
+      - banking-net
+
+networks:
+  banking-net:
+    driver: bridge
